@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Native IPv4 subnet calculator for CIDR, network, broadcast, host range, subnet mask and wildcard mask calculations.">
+  <title>IPv4 Subnet Calculator | Bikram Bhujel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <header class="hero">
+      <p class="eyebrow">Phase 11 · Native tool</p>
+      <h1>IPv4 Subnet Calculator</h1>
+      <p>Calculate CIDR networks, subnet masks, wildcard masks, broadcast addresses and usable host ranges directly in your browser. No API, iframe or external calculator is used.</p>
+    </header>
+    <section class="layout">
+      <div class="panel inputs">
+        <h2>Network input</h2>
+        <p class="lead">Enter an IPv4 address and CIDR prefix. You can also type CIDR notation directly, for example <code>192.168.10.25/24</code>.</p>
+        <div class="two">
+          <div class="field"><label for="address">IPv4 address</label><input id="address" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="192.168.10.25"></div>
+          <div class="field"><label for="prefix">CIDR prefix</label><input id="prefix" type="number" min="0" max="32" step="1" value="24"></div>
+        </div>
+        <div class="actions"><button id="calculate" type="button">Calculate subnet</button><button id="sample" class="secondary" type="button">Load example</button><button id="reset" class="secondary" type="button">Reset</button></div>
+        <div class="security">Calculation is performed locally in your browser. IPv4 addresses entered here are not submitted to the website backend.</div>
+      </div>
+      <div class="panel results">
+        <h2>Subnet details</h2>
+        <p class="lead">Results use standard IPv4 CIDR semantics, including RFC 3021 handling for /31 point-to-point networks.</p>
+        <div id="result" aria-live="polite"><div class="empty-state">Enter an IPv4 address and CIDR prefix to calculate the network.</div></div>
+      </div>
+    </section>
+    <p class="footer">BikramBhujel Website Tools · Native client-side implementation</p>
+  </main>
+  <script src="subnet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
