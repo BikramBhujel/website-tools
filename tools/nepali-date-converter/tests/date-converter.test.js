@@ -1,0 +1,13 @@
+const assert=require('assert');
+const d=require('../date-converter.js');
+let x=d.bsToAd(2080,1,15);assert.strictEqual(x.iso,'2023-04-28');
+x=d.adToBs(2023,4,28);assert.strictEqual(x.iso,'2080-01-15');
+x=d.bsToAd(2083,5,7);assert.strictEqual(x.iso,'2026-08-23');
+x=d.adToBs(2026,8,23);assert.strictEqual(x.iso,'2083-05-07');
+assert.strictEqual(d.toEnglishDigits('२०८३-०५-०७'),'2083-05-07');
+assert.strictEqual(d.toNepaliDigits('2083'),'२०८३');
+assert.throws(()=>d.bsToAd(2083,13,1));
+assert.throws(()=>d.bsToAd(2083,1,40));
+assert.throws(()=>d.adToBs(2026,2,30));
+assert.throws(()=>d.adToBs(1800,1,1));
+console.log('All Nepali date converter tests passed.');
