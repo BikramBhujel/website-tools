@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Native PoE budget calculator for switch power, port capacity and powered-device planning.">
+  <title>PoE Budget Calculator | Bikram Bhujel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="margin:0;background:#f7f8fa;padding:24px">
+<div id="bb-poe-calculator">
+  <section class="bb-poe-hero">
+    <div>
+      <p class="bb-poe-kicker">Network planning tool</p>
+      <h2>PoE Budget Calculator</h2>
+      <p>Size switch power budgets for access points, cameras, phones and other powered devices before deployment.</p>
+    </div>
+    <div class="bb-poe-local">LOCAL CALCULATION</div>
+  </section>
+
+  <section class="bb-poe-workspace">
+    <div class="bb-poe-plan">
+      <div class="bb-poe-section-head"><div><h3>Power plan</h3><p>Enter the switch limits, then add each powered-device group that will share the budget.</p></div></div>
+      <div class="bb-poe-config">
+        <div class="bb-poe-field"><label for="bb-poe-budget">Switch PoE budget (W)</label><input id="bb-poe-budget" type="number" min="0.1" step="0.1" value="370"></div>
+        <div class="bb-poe-field"><label for="bb-poe-ports">PoE-capable ports</label><input id="bb-poe-ports" type="number" min="1" step="1" value="24"></div>
+        <div class="bb-poe-field"><label for="bb-poe-reserve">Design reserve (%)</label><input id="bb-poe-reserve" type="number" min="0" max="99" step="1" value="20"></div>
+        <div class="bb-poe-field"><label for="bb-poe-standard">Per-port capability</label><select id="bb-poe-standard"><option value="af">802.3af · 15.4 W</option><option value="at" selected>802.3at · 30 W</option><option value="bt3">802.3bt Type 3 · 60 W</option><option value="bt4">802.3bt Type 4 · 90 W</option></select></div>
+      </div>
+      <div class="bb-poe-devices-head"><div><strong>Powered devices</strong><div class="bb-poe-help">Use the maximum switch-side/PSE draw from the device or switch documentation when available.</div></div><button id="bb-poe-add" class="bb-poe-btn secondary" type="button">Add device group</button></div>
+      <div id="bb-poe-groups"></div>
+      <div class="bb-poe-actions"><button id="bb-poe-calculate" class="bb-poe-btn" type="button">Calculate budget</button><button id="bb-poe-example" class="bb-poe-btn secondary" type="button">Load office example</button><button id="bb-poe-reset" class="bb-poe-btn secondary" type="button">Reset</button></div>
+    </div>
+    <aside class="bb-poe-summary"><div class="bb-poe-section-head"><div><h3>Budget summary</h3><p>Power and port capacity are checked independently so an apparently healthy wattage plan cannot hide a port-count problem.</p></div></div><div id="bb-poe-result"></div></aside>
+  </section>
+
+  <section class="bb-poe-reference"><h3>IEEE PoE reference</h3><div class="bb-poe-ref-grid"><div class="bb-poe-ref-item"><strong>802.3af · Type 1</strong><span>15.4 W PSE<br>12.95 W PD<br>2 pairs</span></div><div class="bb-poe-ref-item"><strong>802.3at · Type 2</strong><span>30 W PSE<br>25.5 W PD<br>2 pairs</span></div><div class="bb-poe-ref-item"><strong>802.3bt · Type 3</strong><span>60 W PSE<br>51 W PD<br>4 pairs</span></div><div class="bb-poe-ref-item"><strong>802.3bt · Type 4</strong><span>90 W PSE<br>71.3 W PD<br>4 pairs</span></div></div><p>Actual power available at the powered device can be lower because of cabling losses. This is a planning calculator; confirm final power requirements against the switch and powered-device datasheets.</p></section>
+</div>
+<script src="poe.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
