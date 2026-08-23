@@ -2,6 +2,7 @@
   'use strict';
 
   var $ = function(id){ return document.getElementById(id); };
+  var lastResult = null;
 
   function formatNumber(n){
     return Number(n).toLocaleString('en-US');
@@ -16,12 +17,41 @@
   function row(label, value, copyValue){
     var safeValue = escapeHtml(value);
     var safeCopy = escapeHtml(copyValue == null ? value : copyValue);
-    return '<div class="result-row"><div class="result-label">'+escapeHtml(label)+'</div><div class="result-value"><code>'+safeValue+'</code><button class="copy-btn" type="button" data-copy="'+safeCopy+'" aria-label="Copy '+escapeHtml(label)+'">Copy</button></div></div>';
+    return '<div class="bb-subnet-result-row"><div class="bb-subnet-result-label">'+escapeHtml(label)+'</div><div class="bb-subnet-result-value"><code>'+safeValue+'</code><button class="bb-subnet-copy" type="button" data-copy="'+safeCopy+'" aria-label="Copy '+escapeHtml(label)+'">Copy</button></div></div>';
+  }
+
+  function routeItem(label, value){
+    return '<div class="bb-subnet-route-item"><span>'+escapeHtml(label)+'</span><code>'+escapeHtml(value)+'</code></div>';
+  }
+
+  function summaryText(result){
+    return [
+      'IPv4 Subnet Summary',
+      'Input: '+result.inputAddress+'/'+result.prefix,
+      'CIDR network: '+result.cidr,
+      'Subnet mask: '+result.subnetMask,
+      'Wildcard mask: '+result.wildcardMask,
+      'Network address: '+result.networkAddress,
+      'Broadcast address: '+result.broadcastAddress,
+      'First usable host: '+result.firstUsable,
+      'Last usable host: '+result.lastUsable,
+      'Total addresses: '+result.totalAddresses,
+      'Usable hosts: '+result.usableHosts,
+      'Address type: '+result.addressType
+    ].join('\n');
   }
 
   function render(result){
+    lastResult = result;
+    $('copy-summary').hidden = false;
     $('result').innerHTML =
-      '<div class="result-grid">' +
+      '<div class="bb-subnet-route" aria-label="Address range overview">' +
+        routeItem('Network', result.networkAddress) +
+        routeItem('First host', result.firstUsable) +
+        routeItem('Last host', result.lastUsable) +
+        routeItem('Broadcast', result.broadcastAddress) +
+      '</div>' +
+      '<div class="bb-subnet-result-table">' +
         row('CIDR network', result.cidr) +
         row('Subnet mask', result.subnetMask) +
         row('Wildcard mask', result.wildcardMask) +
@@ -33,24 +63,23 @@
         row('Usable hosts', formatNumber(result.usableHosts), result.usableHosts) +
         row('Address type', result.addressType) +
       '</div>' +
-      '<div class="binary-block"><div><span>Address (binary)</span><code>'+escapeHtml(result.binaryAddress)+'</code></div><div><span>Mask (binary)</span><code>'+escapeHtml(result.binaryMask)+'</code></div></div>' +
-      '<p class="result-note">'+escapeHtml(result.hostSemantics)+'</p>';
+      '<div class="bb-subnet-binary"><div><span>Address in binary</span><code>'+escapeHtml(result.binaryAddress)+'</code></div><div><span>Mask in binary</span><code>'+escapeHtml(result.binaryMask)+'</code></div></div>' +
+      '<p class="bb-subnet-note">'+escapeHtml(result.hostSemantics)+'</p>';
 
-    document.querySelectorAll('[data-copy]').forEach(function(btn){
+    document.querySelectorAll('#bb-subnet-tool [data-copy]').forEach(function(btn){
       btn.addEventListener('click', function(){ copyText(btn.getAttribute('data-copy'), btn); });
     });
   }
 
   function showError(message){
-    $('result').innerHTML = '<div class="error" role="alert">'+escapeHtml(message)+'</div>';
+    lastResult = null;
+    $('copy-summary').hidden = true;
+    $('result').innerHTML = '<div class="bb-subnet-error" role="alert">'+escapeHtml(message)+'</div>';
   }
 
   async function copyText(text, button){
     try{
       await navigator.clipboard.writeText(text);
-      var old = button.textContent;
-      button.textContent = 'Copied';
-      setTimeout(function(){ button.textContent = old; }, 1000);
     }catch(e){
       var textarea = document.createElement('textarea');
       textarea.value = text;
@@ -60,9 +89,11 @@
       textarea.select();
       document.execCommand('copy');
       textarea.remove();
-      var old2 = button.textContent;
+    }
+    if(button){
+      var old = button.textContent;
       button.textContent = 'Copied';
-      setTimeout(function(){ button.textContent = old2; }, 1000);
+      setTimeout(function(){ button.textContent = old; }, 900);
     }
   }
 
@@ -77,6 +108,16 @@
     }catch(e){
       showError(e && e.message ? e.message : 'Unable to calculate this subnet.');
     }
+  }
+
+  function reset(){
+    lastResult = null;
+    $('address').value = '';
+    $('prefix').value = '24';
+    $('copy-summary').hidden = true;
+    $('result').innerHTML = '<div class="bb-subnet-empty"><strong>Ready to calculate</strong><span>Enter an IPv4 address and CIDR prefix to see the network boundaries and host range.</span></div>';
+    $('address').focus();
+    try { history.replaceState(null, '', location.pathname + location.search); } catch(e) {}
   }
 
   function loadHash(){
@@ -99,12 +140,25 @@
     $('prefix').value = '23';
     calculate();
   });
-  $('reset').addEventListener('click', function(){
-    $('address').value = '';
-    $('prefix').value = '24';
-    $('result').innerHTML = '<div class="empty-state">Enter an IPv4 address and CIDR prefix to calculate the network.</div>';
-    $('address').focus();
-    try { history.replaceState(null, '', location.pathname + location.search); } catch(e) {}
+  $('reset').addEventListener('click', reset);
+  $('copy-summary').addEventListener('click', function(){
+    if(lastResult) copyText(summaryText(lastResult), $('copy-summary'));
+  });
+
+  document.querySelectorAll('#bb-subnet-tool [data-prefix]').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      $('prefix').value = btn.getAttribute('data-prefix');
+      if($('address').value.trim()) calculate();
+      else $('address').focus();
+    });
+  });
+
+  $('address').addEventListener('input', function(){
+    var m = $('address').value.trim().match(/\/(\d{1,2})$/);
+    if(m){
+      var n = Number(m[1]);
+      if(n >= 0 && n <= 32) $('prefix').value = String(n);
+    }
   });
   $('address').addEventListener('keydown', function(e){ if(e.key === 'Enter') calculate(); });
   $('prefix').addEventListener('keydown', function(e){ if(e.key === 'Enter') calculate(); });
