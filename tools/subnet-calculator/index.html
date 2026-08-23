@@ -8,31 +8,94 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main class="shell">
-    <header class="hero">
-      <p class="eyebrow">Phase 11 · Native tool</p>
-      <h1>IPv4 Subnet Calculator</h1>
-      <p>Calculate CIDR networks, subnet masks, wildcard masks, broadcast addresses and usable host ranges directly in your browser. No API, iframe or external calculator is used.</p>
-    </header>
-    <section class="layout">
-      <div class="panel inputs">
-        <h2>Network input</h2>
-        <p class="lead">Enter an IPv4 address and CIDR prefix. You can also type CIDR notation directly, for example <code>192.168.10.25/24</code>.</p>
-        <div class="two">
-          <div class="field"><label for="address">IPv4 address</label><input id="address" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="192.168.10.25"></div>
-          <div class="field"><label for="prefix">CIDR prefix</label><input id="prefix" type="number" min="0" max="32" step="1" value="24"></div>
-        </div>
-        <div class="actions"><button id="calculate" type="button">Calculate subnet</button><button id="sample" class="secondary" type="button">Load example</button><button id="reset" class="secondary" type="button">Reset</button></div>
-        <div class="security">Calculation is performed locally in your browser. IPv4 addresses entered here are not submitted to the website backend.</div>
+  <main id="bb-subnet-tool" class="bb-subnet-shell">
+    <header class="bb-subnet-hero">
+      <div class="bb-subnet-hero-copy">
+        <p class="bb-subnet-eyebrow">Networking tool</p>
+        <h1>IPv4 Subnet Calculator</h1>
+        <p>Calculate network boundaries, masks and usable host ranges from an IPv4 address and CIDR prefix. The calculation runs entirely in your browser.</p>
       </div>
-      <div class="panel results">
-        <h2>Subnet details</h2>
-        <p class="lead">Results use standard IPv4 CIDR semantics, including RFC 3021 handling for /31 point-to-point networks.</p>
-        <div id="result" aria-live="polite"><div class="empty-state">Enter an IPv4 address and CIDR prefix to calculate the network.</div></div>
+      <div class="bb-subnet-hero-meta" aria-label="Tool characteristics">
+        <span>IPv4</span>
+        <span>Client-side</span>
+        <span>No API</span>
+      </div>
+    </header>
+
+    <section class="bb-subnet-workspace" aria-label="Subnet calculator">
+      <div class="bb-subnet-input-pane">
+        <div class="bb-subnet-section-head">
+          <h2>Network input</h2>
+          <p>Enter an address and prefix, or enter CIDR notation directly in the address field.</p>
+        </div>
+
+        <div class="bb-subnet-field">
+          <label for="address">IPv4 address</label>
+          <input id="address" type="text" inputmode="decimal" autocomplete="off" spellcheck="false" placeholder="192.168.10.25" aria-describedby="address-help">
+          <small id="address-help">Example: 172.17.174.1 or 172.17.174.1/23</small>
+        </div>
+
+        <div class="bb-subnet-field">
+          <label for="prefix">CIDR prefix</label>
+          <div class="bb-subnet-prefix-control">
+            <span class="bb-subnet-prefix-mark" aria-hidden="true">/</span>
+            <input id="prefix" type="number" min="0" max="32" step="1" value="24">
+          </div>
+        </div>
+
+        <div class="bb-subnet-common" aria-label="Common CIDR prefixes">
+          <span>Common</span>
+          <button type="button" data-prefix="16">/16</button>
+          <button type="button" data-prefix="22">/22</button>
+          <button type="button" data-prefix="23">/23</button>
+          <button type="button" data-prefix="24">/24</button>
+          <button type="button" data-prefix="30">/30</button>
+          <button type="button" data-prefix="31">/31</button>
+        </div>
+
+        <div class="bb-subnet-actions">
+          <button id="calculate" class="bb-subnet-primary" type="button">Calculate</button>
+          <button id="sample" class="bb-subnet-secondary" type="button">Use example</button>
+          <button id="reset" class="bb-subnet-tertiary" type="button">Clear</button>
+        </div>
+
+        <p class="bb-subnet-local-note">Your input stays on this device. No address entered here is sent to the website backend.</p>
+      </div>
+
+      <div class="bb-subnet-result-pane">
+        <div class="bb-subnet-section-head bb-subnet-result-head">
+          <div>
+            <h2>Subnet details</h2>
+            <p>Standard classless IPv4/CIDR calculation with RFC 3021 handling for /31 point-to-point networks.</p>
+          </div>
+          <button id="copy-summary" class="bb-subnet-copy-summary" type="button" hidden>Copy summary</button>
+        </div>
+        <div id="result" aria-live="polite">
+          <div class="bb-subnet-empty">
+            <strong>Ready to calculate</strong>
+            <span>Enter an IPv4 address and CIDR prefix to see the network boundaries and host range.</span>
+          </div>
+        </div>
       </div>
     </section>
-    <p class="footer">BikramBhujel Website Tools · Native client-side implementation</p>
+
+    <section class="bb-subnet-reference" aria-labelledby="cidr-reference-title">
+      <div>
+        <p class="bb-subnet-reference-kicker">Quick reference</p>
+        <h2 id="cidr-reference-title">Common IPv4 prefixes</h2>
+      </div>
+      <div class="bb-subnet-reference-table" role="table" aria-label="Common IPv4 prefix reference">
+        <div role="row"><span role="cell">/24</span><span role="cell">255.255.255.0</span><span role="cell">254 usable hosts</span></div>
+        <div role="row"><span role="cell">/25</span><span role="cell">255.255.255.128</span><span role="cell">126 usable hosts</span></div>
+        <div role="row"><span role="cell">/26</span><span role="cell">255.255.255.192</span><span role="cell">62 usable hosts</span></div>
+        <div role="row"><span role="cell">/27</span><span role="cell">255.255.255.224</span><span role="cell">30 usable hosts</span></div>
+        <div role="row"><span role="cell">/28</span><span role="cell">255.255.255.240</span><span role="cell">14 usable hosts</span></div>
+        <div role="row"><span role="cell">/29</span><span role="cell">255.255.255.248</span><span role="cell">6 usable hosts</span></div>
+        <div role="row"><span role="cell">/30</span><span role="cell">255.255.255.252</span><span role="cell">2 usable hosts</span></div>
+      </div>
+    </section>
   </main>
+
   <script src="subnet.js"></script>
   <script src="app.js"></script>
 </body>
