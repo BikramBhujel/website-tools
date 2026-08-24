@@ -1,0 +1,49 @@
+#bb-wifi-planner{--navy:#101827;--navy2:#172235;--ink:#182230;--text:#475467;--muted:#667085;--line:#e4e7ec;--surface:#f7f8fa;--accent:#ffc000;max-width:1180px;margin:0 auto;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink)}
+#bb-wifi-planner *{box-sizing:border-box}
+#bb-wifi-planner h2,#bb-wifi-planner h3,#bb-wifi-planner p{margin-top:0}
+.bb-wifi-hero{display:flex;justify-content:space-between;gap:32px;align-items:end;padding:30px 32px;border-radius:12px;background:var(--navy2);color:#fff}
+.bb-wifi-kicker{margin:0 0 7px;color:var(--accent);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}
+.bb-wifi-hero h2{margin:0;font-size:34px;line-height:1.1;letter-spacing:-.03em}
+.bb-wifi-hero p:last-child{max-width:720px;margin:10px 0 0;color:#cbd5e1;font-size:13px;line-height:1.65}
+.bb-wifi-local{flex:0 0 auto;padding:7px 9px;border:1px solid rgba(255,255,255,.16);border-radius:6px;color:#dce3ec;font-size:9px;font-weight:800;letter-spacing:.09em}
+.bb-wifi-workspace{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(320px,.8fr);gap:16px;margin-top:16px}
+.bb-wifi-plan,.bb-wifi-summary,.bb-wifi-map-section,.bb-wifi-reference{padding:24px;border:1px solid var(--line);border-radius:10px;background:#fff}
+.bb-wifi-section-head{display:flex;justify-content:space-between;gap:18px;margin-bottom:18px}
+.bb-wifi-section-head h3,.bb-wifi-reference h3{margin:0;color:var(--ink);font-size:17px}
+.bb-wifi-section-head p{max-width:720px;margin:5px 0 0;color:var(--muted);font-size:10.5px;line-height:1.55}
+.bb-wifi-config{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.bb-wifi-field{display:flex;flex-direction:column;gap:6px}
+.bb-wifi-field label{color:var(--text);font-size:10px;font-weight:750}
+.bb-wifi-field input,.bb-wifi-field select{width:100%;height:40px;padding:0 10px;border:1px solid #ccd2db;border-radius:7px;background:#fff;color:var(--ink);font:inherit;font-size:11px;outline:none}
+.bb-wifi-field input:focus,.bb-wifi-field select:focus{border-color:#b78700;box-shadow:0 0 0 3px rgba(255,192,0,.12)}
+.bb-wifi-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.bb-wifi-btn{min-height:39px;padding:0 14px;border:1px solid var(--navy);border-radius:7px;background:var(--navy);color:#fff;font:inherit;font-size:10.5px;font-weight:800;cursor:pointer}
+.bb-wifi-btn.secondary{border-color:var(--line);background:#fff;color:var(--ink)}
+.bb-wifi-btn:hover{filter:brightness(.98)}
+.bb-wifi-assumption{margin-top:20px;padding:14px 16px;border-left:3px solid var(--accent);background:#fbfcfd}
+.bb-wifi-assumption strong{font-size:10.5px}
+.bb-wifi-assumption p{margin:4px 0 0;color:var(--muted);font-size:10px;line-height:1.6}
+.bb-wifi-summary{align-self:start}
+.bb-wifi-metric{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px;align-items:end;padding:13px 0;border-bottom:1px solid var(--line)}
+.bb-wifi-metric:first-child{padding-top:0}
+.bb-wifi-metric span{color:var(--muted);font-size:10px}
+.bb-wifi-metric strong{color:var(--navy);font-size:22px;letter-spacing:-.03em}
+.bb-wifi-verdict{margin-top:15px;padding:14px;border-radius:8px;background:var(--surface)}
+.bb-wifi-verdict strong{display:block;color:var(--ink);font-size:11px}
+.bb-wifi-verdict p{margin:5px 0 0;color:var(--text);font-size:10.5px;line-height:1.55}
+.bb-wifi-risk{margin-top:12px;padding:11px 13px;border:1px solid #f3d88d;border-radius:7px;background:#fffbeb;color:#7a5b00;font-size:9.8px;line-height:1.55}
+.bb-wifi-map-section,.bb-wifi-reference{margin-top:16px}
+.bb-wifi-map{min-height:320px;border:1px solid var(--line);border-radius:8px;background:#fbfcfd;overflow:hidden}
+.bb-wifi-map svg{display:block;width:100%;height:auto;min-height:320px}
+.bb-wifi-map .floor{fill:#fff;stroke:#cfd5dd;stroke-width:1.5}
+.bb-wifi-map .gridline{stroke:#eef1f4;stroke-width:1}
+.bb-wifi-map .cell{fill:rgba(255,192,0,.10);stroke:rgba(183,135,0,.34);stroke-width:1}
+.bb-wifi-map .ap{fill:var(--navy);stroke:#fff;stroke-width:2}
+.bb-wifi-map .ap-label{fill:#fff;font-size:10px;font-weight:800;text-anchor:middle;dominant-baseline:central}
+.bb-wifi-map .axis{fill:#667085;font-size:9px}
+.bb-wifi-ref-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;margin-top:14px;background:var(--line);border:1px solid var(--line)}
+.bb-wifi-ref-item{padding:15px;background:#fff}
+.bb-wifi-ref-item strong{display:block;margin-bottom:5px;color:var(--ink);font-size:10.5px}
+.bb-wifi-ref-item span{color:var(--muted);font-size:9.7px;line-height:1.55}
+@media(max-width:900px){.bb-wifi-workspace{grid-template-columns:1fr}.bb-wifi-config{grid-template-columns:repeat(2,minmax(0,1fr))}.bb-wifi-ref-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.bb-wifi-hero{align-items:flex-start;flex-direction:column;padding:24px 20px}.bb-wifi-hero h2{font-size:29px}.bb-wifi-plan,.bb-wifi-summary,.bb-wifi-map-section,.bb-wifi-reference{padding:18px}.bb-wifi-config{grid-template-columns:1fr}.bb-wifi-ref-grid{grid-template-columns:1fr}.bb-wifi-map{min-height:260px}}

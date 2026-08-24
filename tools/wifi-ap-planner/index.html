@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Native Wi-Fi AP planner for preliminary indoor access-point count, capacity and placement planning.">
+  <title>Wi-Fi AP Planner | Bikram Bhujel</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body style="margin:0;background:#f7f8fa;padding:24px">
+<div id="bb-wifi-planner">
+  <section class="bb-wifi-hero">
+    <div>
+      <p class="bb-wifi-kicker">Network planning tool</p>
+      <h2>Wi-Fi AP Planner</h2>
+      <p>Estimate access-point count from both RF coverage and client capacity, then generate a preliminary ceiling-placement grid.</p>
+    </div>
+    <div class="bb-wifi-local">LOCAL CALCULATION</div>
+  </section>
+
+  <section class="bb-wifi-workspace">
+    <div class="bb-wifi-plan">
+      <div class="bb-wifi-section-head">
+        <div><h3>Site inputs</h3><p>Use indoor dimensions and design targets. Results are preliminary and must be validated with a predictive or on-site RF survey.</p></div>
+      </div>
+
+      <div class="bb-wifi-config">
+        <div class="bb-wifi-field"><label for="bb-wifi-length">Floor length (m)</label><input id="bb-wifi-length" type="number" min="1" step="0.1" value="30"></div>
+        <div class="bb-wifi-field"><label for="bb-wifi-width">Floor width (m)</label><input id="bb-wifi-width" type="number" min="1" step="0.1" value="18"></div>
+        <div class="bb-wifi-field"><label for="bb-wifi-clients">Concurrent clients</label><input id="bb-wifi-clients" type="number" min="1" step="1" value="80"></div>
+        <div class="bb-wifi-field"><label for="bb-wifi-environment">Environment</label><select id="bb-wifi-environment"><option value="open">Open office / classroom</option><option value="mixed" selected>Mixed office with partitions</option><option value="dense">Dense rooms / masonry walls</option><option value="warehouse">Warehouse / open industrial</option></select></div>
+        <div class="bb-wifi-field"><label for="bb-wifi-band">Primary design band</label><select id="bb-wifi-band"><option value="5" selected>5 GHz</option><option value="6">6 GHz</option></select></div>
+        <div class="bb-wifi-field"><label for="bb-wifi-rssi">Target edge RSSI</label><select id="bb-wifi-rssi"><option value="-62">-62 dBm · voice/high performance</option><option value="-65">-65 dBm · strong business WLAN</option><option value="-67" selected>-67 dBm · general enterprise</option><option value="-70">-70 dBm · coverage-oriented</option></select></div>
+        <div class="bb-wifi-field"><label for="bb-wifi-height">Ceiling / AP height (m)</label><input id="bb-wifi-height" type="number" min="2" max="20" step="0.1" value="2.8"></div>
+        <div class="bb-wifi-field"><label for="bb-wifi-maxclients">Design clients per AP</label><input id="bb-wifi-maxclients" type="number" min="5" max="200" step="1" value="35"></div>
+        <div class="bb-wifi-field"><label for="bb-wifi-reserve">Capacity reserve (%)</label><input id="bb-wifi-reserve" type="number" min="0" max="80" step="1" value="20"></div>
+      </div>
+
+      <div class="bb-wifi-actions">
+        <button id="bb-wifi-calculate" class="bb-wifi-btn" type="button">Plan APs</button>
+        <button id="bb-wifi-example" class="bb-wifi-btn secondary" type="button">Load office example</button>
+        <button id="bb-wifi-reset" class="bb-wifi-btn secondary" type="button">Reset</button>
+      </div>
+
+      <div class="bb-wifi-assumption">
+        <strong>What this planner does not model</strong>
+        <p>Wall materials, furniture, neighboring WLANs, channel reuse, transmit power, antenna patterns, client radio differences, roaming, DFS events and real spectrum utilization are not simulated.</p>
+      </div>
+    </div>
+
+    <aside class="bb-wifi-summary">
+      <div class="bb-wifi-section-head"><div><h3>Planning result</h3><p>The recommendation is the higher of the coverage requirement and capacity requirement.</p></div></div>
+      <div id="bb-wifi-result"></div>
+    </aside>
+  </section>
+
+  <section class="bb-wifi-map-section">
+    <div class="bb-wifi-section-head"><div><h3>Preliminary placement grid</h3><p>Use this only as a starting pattern. Move APs after reviewing walls, rooms, obstructions, cabling and RF survey results.</p></div></div>
+    <div id="bb-wifi-map" class="bb-wifi-map" aria-live="polite"></div>
+  </section>
+
+  <section class="bb-wifi-reference">
+    <h3>Design guidance</h3>
+    <div class="bb-wifi-ref-grid">
+      <div class="bb-wifi-ref-item"><strong>Coverage</strong><span>Use a target edge RSSI appropriate to the application. Tighter RSSI targets generally require more APs.</span></div>
+      <div class="bb-wifi-ref-item"><strong>Capacity</strong><span>Client count alone is not airtime demand. High-throughput or voice-heavy environments may need a lower client-per-AP design limit.</span></div>
+      <div class="bb-wifi-ref-item"><strong>Placement</strong><span>Avoid blindly centering APs in corridors. Place radios where users are, while accounting for wall attenuation and cell overlap.</span></div>
+      <div class="bb-wifi-ref-item"><strong>Validation</strong><span>Finalize with a predictive design and post-install validation survey using the actual AP model, channel plan and transmit power.</span></div>
+    </div>
+  </section>
+</div>
+<script src="planner.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
