@@ -1,0 +1,180 @@
+<div id="bbpdf">
+  <style>
+    #bbpdf{--bb-accent:#2563eb;--bb-border:#e5e7eb;--bb-muted:#64748b;--bb-bg:#f8fafc;font-family:inherit;color:#0f172a;max-width:1050px;margin:20px auto;padding:0 14px;box-sizing:border-box}
+    #bbpdf *{box-sizing:border-box}
+    #bbpdf .bb-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin-bottom:18px}
+    #bbpdf h1{font-size:clamp(26px,4vw,38px);margin:0 0 5px;font-weight:800;letter-spacing:-.03em}
+    #bbpdf .bb-sub{margin:0;color:var(--bb-muted);font-size:14px}
+    #bbpdf .bb-status{font-size:12px;color:var(--bb-muted);white-space:nowrap}
+    #bbpdf .bb-tabs{display:flex;gap:7px;overflow:auto;padding:4px;margin-bottom:14px;border-bottom:1px solid var(--bb-border)}
+    #bbpdf .bb-tab{border:0;background:transparent;padding:10px 14px;border-radius:9px 9px 0 0;cursor:pointer;font:inherit;font-size:14px;white-space:nowrap;color:var(--bb-muted)}
+    #bbpdf .bb-tab:hover{background:var(--bb-bg);color:#0f172a}
+    #bbpdf .bb-tab.active{background:#eff6ff;color:var(--bb-accent);font-weight:700}
+    #bbpdf .bb-card{border:1px solid var(--bb-border);border-radius:16px;background:#fff;padding:20px;box-shadow:0 8px 30px rgba(15,23,42,.05)}
+    #bbpdf .bb-drop{border:2px dashed #cbd5e1;border-radius:14px;padding:38px 20px;text-align:center;background:var(--bb-bg);transition:.18s;cursor:pointer}
+    #bbpdf .bb-drop.drag{border-color:var(--bb-accent);background:#eff6ff}
+    #bbpdf .bb-drop strong{display:block;font-size:17px;margin-bottom:6px}
+    #bbpdf .bb-drop span{display:block;color:var(--bb-muted);font-size:13px}
+    #bbpdf .bb-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    #bbpdf button{font:inherit}
+    #bbpdf .bb-primary{border:0;border-radius:9px;background:var(--bb-accent);color:#fff;padding:11px 17px;font-weight:700;cursor:pointer}
+    #bbpdf .bb-primary:disabled{opacity:.55;cursor:not-allowed}
+    #bbpdf .bb-secondary{border:1px solid var(--bb-border);border-radius:9px;background:#fff;padding:10px 15px;cursor:pointer}
+    #bbpdf .bb-files{margin-top:15px;display:grid;gap:8px}
+    #bbpdf .bb-file{display:flex;align-items:center;gap:10px;border:1px solid var(--bb-border);border-radius:10px;padding:10px 12px;background:#fff}
+    #bbpdf .bb-file-name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+    #bbpdf .bb-file-size{color:var(--bb-muted);font-size:12px}
+    #bbpdf .bb-remove{border:0;background:transparent;color:#94a3b8;cursor:pointer;font-size:18px}
+    #bbpdf .bb-options{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:16px;padding:14px;border:1px solid var(--bb-border);border-radius:10px;background:var(--bb-bg)}
+    #bbpdf label{font-size:13px;font-weight:600}
+    #bbpdf input[type=text],#bbpdf select{border:1px solid var(--bb-border);border-radius:8px;padding:9px 10px;background:#fff;font:inherit}
+    #bbpdf .bb-note{margin-top:12px;color:var(--bb-muted);font-size:12px;line-height:1.5}
+    #bbpdf .bb-result{display:none;margin-top:15px;border:1px solid #bbf7d0;border-radius:10px;background:#f0fdf4;padding:13px}
+    #bbpdf .bb-error{display:none;margin-top:15px;border:1px solid #fecaca;border-radius:10px;background:#fef2f2;color:#991b1b;padding:13px;font-size:13px}
+    #bbpdf .bb-progress{display:none;margin-top:15px;height:6px;border-radius:99px;background:#e2e8f0;overflow:hidden}
+    #bbpdf .bb-progress>i{display:block;height:100%;width:35%;background:var(--bb-accent);animation:bbpdfmove 1.1s infinite ease-in-out}
+    @keyframes bbpdfmove{0%{transform:translateX(-120%)}100%{transform:translateX(330%)}}
+    @media(max-width:640px){#bbpdf{padding:0 8px}.bb-head{align-items:start!important;flex-direction:column}.bb-card{padding:14px}.bb-drop{padding:28px 12px}}
+  </style>
+
+  <div class="bb-head">
+    <div><h1>BBPDF</h1><p class="bb-sub">Simple PDF tools in one workspace.</p></div>
+    <div class="bb-status" id="bbpdfStatus">Ready</div>
+  </div>
+
+  <div class="bb-tabs" role="tablist" aria-label="BBPDF tools">
+    <button class="bb-tab active" data-tool="merge" type="button">Merge</button>
+    <button class="bb-tab" data-tool="split" type="button">Split</button>
+    <button class="bb-tab" data-tool="compress" type="button">Compress</button>
+  </div>
+
+  <div class="bb-card">
+    <div class="bb-drop" id="bbpdfDrop">
+      <strong id="bbpdfDropTitle">Drop PDF files here</strong>
+      <span id="bbpdfDropHint">or click to select files</span>
+      <input id="bbpdfInput" type="file" accept="application/pdf,.pdf" multiple hidden>
+    </div>
+
+    <div id="bbpdfOptions" class="bb-options"></div>
+    <div id="bbpdfFiles" class="bb-files"></div>
+
+    <div class="bb-actions">
+      <button class="bb-primary" id="bbpdfRun" type="button">Merge PDFs</button>
+      <button class="bb-secondary" id="bbpdfClear" type="button">Clear</button>
+    </div>
+
+    <div class="bb-progress" id="bbpdfProgress"><i></i></div>
+    <div class="bb-error" id="bbpdfError"></div>
+    <div class="bb-result" id="bbpdfResult">Your file is ready. The download should start automatically.</div>
+    <div class="bb-note">Files are sent to the BBPDF processing server for the selected operation. Keep this page open until processing finishes.</div>
+  </div>
+
+  <script>
+  (function(){
+    'use strict';
+
+    /* Change this to your public BBPDF API hostname. */
+    const BBPDF_API_BASE = 'https://pdf-api.bikrambhujel.com.np';
+    const MAX_FILE_MB = 50;
+    const MAX_FILES = 20;
+
+    const root=document.getElementById('bbpdf');
+    const input=document.getElementById('bbpdfInput');
+    const drop=document.getElementById('bbpdfDrop');
+    const filesEl=document.getElementById('bbpdfFiles');
+    const optionsEl=document.getElementById('bbpdfOptions');
+    const run=document.getElementById('bbpdfRun');
+    const clear=document.getElementById('bbpdfClear');
+    const progress=document.getElementById('bbpdfProgress');
+    const error=document.getElementById('bbpdfError');
+    const result=document.getElementById('bbpdfResult');
+    const status=document.getElementById('bbpdfStatus');
+    const tabs=[...root.querySelectorAll('.bb-tab')];
+    let tool='merge';
+    let selected=[];
+
+    const labels={merge:['Drop PDF files here','or click to select files','Merge PDFs'],split:['Drop a PDF here','or click to select a PDF','Split PDF'],compress:['Drop a PDF here','or click to select a PDF','Compress PDF']};
+    const mb=n=>(n/1024/1024).toFixed(2)+' MB';
+
+    function setError(msg){error.textContent=msg;error.style.display=msg?'block':'none'}
+    function resetMessages(){setError('');result.style.display='none';progress.style.display='none'}
+    function renderOptions(){
+      optionsEl.innerHTML='';
+      if(tool==='split'){
+        optionsEl.innerHTML='<label for="bbpdfPages">Pages</label><input id="bbpdfPages" type="text" value="all" placeholder="e.g. 1,3,5-7" aria-label="Pages to split">';
+      } else if(tool==='compress'){
+        optionsEl.innerHTML='<label for="bbpdfLevel">Compression</label><select id="bbpdfLevel"><option value="1">Low</option><option value="2">Balanced</option><option value="3" selected>Recommended</option><option value="4">Strong</option><option value="5">Maximum</option></select>';
+      }
+    }
+    function render(){
+      const l=labels[tool];
+      document.getElementById('bbpdfDropTitle').textContent=l[0];
+      document.getElementById('bbpdfDropHint').textContent=l[1];
+      run.textContent=l[2];
+      input.multiple=tool==='merge';
+      renderOptions();
+      filesEl.innerHTML=selected.map((f,i)=>'<div class="bb-file"><span class="bb-file-name" title="'+escapeHtml(f.name)+'">'+escapeHtml(f.name)+'</span><span class="bb-file-size">'+mb(f.size)+'</span><button class="bb-remove" type="button" data-i="'+i+'" aria-label="Remove file">×</button></div>').join('');
+      filesEl.querySelectorAll('.bb-remove').forEach(b=>b.onclick=()=>{selected.splice(Number(b.dataset.i),1);render()});
+      tabs.forEach(t=>t.classList.toggle('active',t.dataset.tool===tool));
+    }
+    function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function addFiles(list){
+      resetMessages();
+      const incoming=[...list];
+      if(tool!=='merge') selected=[];
+      for(const f of incoming){
+        if(!/\.pdf$/i.test(f.name)){setError('Only PDF files are accepted.');continue}
+        if(f.size>MAX_FILE_MB*1024*1024){setError(f.name+' is larger than '+MAX_FILE_MB+' MB.');continue}
+        if(selected.length>=MAX_FILES)break;
+        selected.push(f);
+      }
+      render();
+    }
+    function download(blob,name){
+      const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),30000);
+    }
+    async function process(){
+      resetMessages();
+      if(!selected.length)return setError('Please select a PDF file first.');
+      if(tool==='merge'&&selected.length<2)return setError('Select at least two PDF files to merge.');
+      run.disabled=true;clear.disabled=true;progress.style.display='block';status.textContent='Processing…';
+      try{
+        const fd=new FormData();
+        if(tool==='merge'){
+          selected.forEach(f=>fd.append('files',f,f.name));
+          const r=await fetch(BBPDF_API_BASE+'/api/merge',{method:'POST',body:fd});
+          await handleResponse(r,'bbpdf-merged.pdf');
+        } else if(tool==='split'){
+          fd.append('file',selected[0],selected[0].name);
+          fd.append('page_numbers',(document.getElementById('bbpdfPages')||{}).value||'all');
+          const r=await fetch(BBPDF_API_BASE+'/api/split',{method:'POST',body:fd});
+          await handleResponse(r,'bbpdf-split.zip');
+        } else {
+          fd.append('file',selected[0],selected[0].name);
+          fd.append('optimize_level',(document.getElementById('bbpdfLevel')||{}).value||'3');
+          const r=await fetch(BBPDF_API_BASE+'/api/compress',{method:'POST',body:fd});
+          await handleResponse(r,'bbpdf-compressed.pdf');
+        }
+        result.style.display='block';status.textContent='Complete';
+      }catch(e){setError(e.message||'Processing failed.');status.textContent='Error'}
+      finally{run.disabled=false;clear.disabled=false;progress.style.display='none'}
+    }
+    async function handleResponse(r,fallback){
+      if(!r.ok){let msg='BBPDF could not process the file.';try{const j=await r.json();msg=j.detail||msg}catch(_){try{msg=(await r.text()).slice(0,500)||msg}catch(__){}}throw new Error(msg)}
+      const blob=await r.blob();
+      let name=fallback;
+      const cd=r.headers.get('content-disposition')||'';const m=cd.match(/filename="?([^";]+)"?/i);if(m)name=m[1];
+      download(blob,name);
+    }
+
+    tabs.forEach(t=>t.onclick=()=>{tool=t.dataset.tool;selected=[];resetMessages();render()});
+    drop.onclick=()=>input.click();
+    input.onchange=e=>addFiles(e.target.files);
+    clear.onclick=()=>{selected=[];input.value='';resetMessages();status.textContent='Ready';render()};
+    run.onclick=process;
+    ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag')}));
+    ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();if(ev==='drop')addFiles(e.dataTransfer.files);drop.classList.remove('drag')}));
+    render();
+  })();
+  </script>
+</div>
