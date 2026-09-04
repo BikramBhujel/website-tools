@@ -1,0 +1,31 @@
+services:
+  gateway:
+    build: ./gateway
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:8081:8000"
+    depends_on:
+      - pdf-engine
+    networks:
+      - bbpdf
+
+  pdf-engine:
+    build:
+      context: ./engine/stirling-pdf
+      dockerfile: docker/embedded/Dockerfile.ultra-lite
+    restart: unless-stopped
+    expose:
+      - "8080"
+    environment:
+      - DOCKER_ENABLE_SECURITY=false
+      - SYSTEM_DEFAULTLOCALE=en-US
+      - UI_APPNAME=BBPDF
+      - UI_HOMEDESCRIPTION=BBPDF PDF tools
+      - METRICS_ENABLED=false
+    networks:
+      - bbpdf
+
+networks:
+  bbpdf:
+    driver: bridge
