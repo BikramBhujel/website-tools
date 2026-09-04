@@ -16,6 +16,7 @@ MAX_FILES = int(os.getenv("BBPDF_MAX_FILES", "20"))
 RATE_LIMIT = int(os.getenv("BBPDF_RATE_LIMIT_PER_MINUTE", "20"))
 TIMEOUT = float(os.getenv("BBPDF_ENGINE_TIMEOUT_SECONDS", "300"))
 ALLOWED_ORIGINS = [x.strip() for x in os.getenv("BBPDF_ALLOWED_ORIGINS", "").split(",") if x.strip()]
+MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024
 
 app = FastAPI(title="BBPDF API", version="1.0.0", docs_url=None, redoc_url=None)
 app.add_middleware(CORSMiddleware, allow_origins=ALLOWED_ORIGINS, allow_credentials=False, allow_methods=["POST", "GET", "OPTIONS"], allow_headers=["Content-Type"])
@@ -31,14 +32,19 @@ def enforce_rate_limit(request: Request) -> None:
     if len(bucket) >= RATE_LIMIT: raise HTTPException(429, "Too many requests. Please try again later.")
     bucket.append(now)
 
-def validate_file(upload: UploadFile) -> None:
-    if not (upload.filename or "").lower().endswith(".pdf"):
-        raise HTTPException(400, f"Only PDF files are accepted: {upload.filename or 'unnamed file'}")
+async def validate_file(upload: UploadFile) -> None:
+    name = (upload.filename or "").lower()
+    if not name.endswith(".pdf"): raise HTTPException(400, f"Only PDF files are accepted: {upload.filename or 'unnamed file'}")
+    if upload.size is not None and upload.size > MAX_FILE_BYTES: raise HTTPException(413, f"Each file must be {MAX_FILE_MB} MB or smaller.")
+    await upload.seek(0)
+    magic = await upload.read(5)
+    await upload.seek(0)
+    if magic != b"%PDF-": raise HTTPException(400, f"The file does not appear to be a valid PDF: {upload.filename or 'unnamed file'}")
 
-def check_count(files: list[UploadFile]) -> None:
+async def check_count(files: list[UploadFile]) -> None:
     if not files: raise HTTPException(400, "At least one PDF file is required.")
     if len(files) > MAX_FILES: raise HTTPException(400, f"Maximum {MAX_FILES} files per operation.")
-    for upload in files: validate_file(upload)
+    for upload in files: await validate_file(upload)
 
 def normalize_filename(name: str | None, fallback: str) -> str:
     raw = os.path.basename(name or fallback).replace("\x00", "")
@@ -81,18 +87,18 @@ async def api_health() -> dict[str, str]: return {"status": "ok", "service": "bb
 
 @app.post("/api/merge")
 async def merge(request: Request, files: list[UploadFile] = File(...)) -> Response:
-    enforce_rate_limit(request); check_count(files)
+    enforce_rate_limit(request); await check_count(files)
     if len(files) < 2: raise HTTPException(400, "Select at least two PDF files to merge.")
     return await call_engine("/api/v1/general/merge-pdfs", files, {"sortType": "orderProvided"}, "bbpdf-merged.pdf")
 
 @app.post("/api/split")
 async def split(request: Request, file: UploadFile = File(...), page_numbers: str = Form("all")) -> Response:
-    enforce_rate_limit(request); check_count([file]); pages = page_numbers.strip() or "all"
+    enforce_rate_limit(request); await check_count([file]); pages = page_numbers.strip() or "all"
     if len(pages) > 1000 or any(c not in "0123456789,- all" for c in pages.lower()): raise HTTPException(400, "Invalid page selection.")
     return await call_engine("/api/v1/general/split-pages", [file], {"pageNumbers": pages}, "bbpdf-split.zip")
 
 @app.post("/api/compress")
 async def compress(request: Request, file: UploadFile = File(...), optimize_level: int = Form(3)) -> Response:
-    enforce_rate_limit(request); check_count([file])
+    enforce_rate_limit(request); await check_count([file])
     if optimize_level < 1 or optimize_level > 5: raise HTTPException(400, "Compression level must be between 1 and 5.")
     return await call_engine("/api/v1/misc/compress-pdf", [file], {"optimizeLevel": str(optimize_level)}, "bbpdf-compressed.pdf")
